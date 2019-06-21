@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <import type="android.view.View" />
+
+    <variable
+            name="pet"
+            type="com.jimmy.encryptionstarter.datalogic.model.Pet" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="8dp"
+          android:paddingBottom="5dp"
+          android:background="@color/colorPrimary">
+
+        <ImageView
+                android:id="@+id/itemImage"
+                android:contentDescription="@string/pet_photo_content_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/esther"
+                app:imageResource="@{pet.name}"
+
+                />
+
+        <TextView
+                android:id="@+id/itemName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="9sp"
+                android:layout_weight="0"
+                android:ellipsize="end"
+                android:maxLines="1"
+
+                android:text="@{pet.name}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/itemImage"
+                tools:text = "@sample/pet_names"
+                android:textSize="20sp"
+                android:textStyle="bold"
+        />
+
+        <TextView
+                android:id="@+id/itemDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9sp"
+                android:layout_marginTop="2dp"
+                android:textSize="16sp"
+                tools:text="Date"
+                android:text="@{pet.birthday}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/itemName"
+        />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+
