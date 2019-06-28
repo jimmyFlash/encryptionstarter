@@ -42,7 +42,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
 
         //Save to shared prefs
-        val editor = context.getSharedPreferences("MyPrefs", Context.MODE_WORLD_READABLE).edit()
+        val editor = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit()
         editor.putString("l", currentDateTimeString)
         editor.apply()
     }
@@ -77,7 +77,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private fun lastLoggedIn(): String? {
         //Retrieve shared prefs data
         val preferences = getApplication<Application>().getSharedPreferences("MyPrefs",
-            Context.MODE_WORLD_WRITEABLE)
+            Context.MODE_PRIVATE)
         return preferences.getString("l", "")
     }
 
