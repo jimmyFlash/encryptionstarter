@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         workingFile = File(filesDir.absolutePath + File.separator + FileConstants.DATA_SOURCE_FILE_NAME)
 
-        login_password.setOnClickListener(this::loginPressed)
+        button.setOnClickListener(this::loginPressed)
 
         activityMainBinding.viewmodel = mViewModel
 

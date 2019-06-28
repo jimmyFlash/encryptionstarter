@@ -34,7 +34,6 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
         updateLoggedInState()
 
-        buttonText.value = getApplication<Application>().getString(R.string.login)
 
     }
 
