@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jimmy.encryptionstarter.R
+import com.jimmy.encryptionstarter.datalogic.FileConstants
 import java.io.File
 import java.io.FileOutputStream
 import java.text.DateFormat
@@ -30,10 +31,14 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
     val proceedToListActivity : MutableLiveData<Boolean> = MutableLiveData()
 
+
+
     init {
 
+        workingFile = File(getApplication<Application>().filesDir.absolutePath +
+                File.separator +
+                FileConstants.DATA_SOURCE_FILE_NAME)
         updateLoggedInState()
-
 
     }
 
@@ -65,11 +70,11 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
             isSignedUp.value = true
             buttonText.value = getApplication<Application>().getString(R.string.login)
 //            login_confirm_password.visibility = View.INVISIBLE
-            loginConfirmPass.value = true
+            loginConfirmPass.value = false
         } else {
             isSignedUp.value = false
             buttonText.value = getApplication<Application>().getString(R.string.signup)
-            loginConfirmPass.value = false
+            loginConfirmPass.value = true
         }
     }
 

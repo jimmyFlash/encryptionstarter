@@ -18,16 +18,12 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mViewModel: MainActivityViewModel
-    private var workingFile: File? = null
+
 
     lateinit var activityMainBinding :ActivityMainBinding
 
     companion object {
         private const val PWD_KEY = "PWD"
-    }
-
-    object FileConstants {
-        const val DATA_SOURCE_FILE_NAME = "pets.xml"
     }
 
 
@@ -44,8 +40,6 @@ class MainActivity : AppCompatActivity() {
         // Specify the current activity as the lifecycle owner.
         activityMainBinding.lifecycleOwner = this
 
-
-        workingFile = File(filesDir.absolutePath + File.separator + FileConstants.DATA_SOURCE_FILE_NAME)
 
         button.setOnClickListener(this::loginPressed)
 
@@ -67,7 +61,6 @@ class MainActivity : AppCompatActivity() {
     fun loginPressed (view : View){
         val password = login_password.text.toString()
 
-        login_confirm_password.text.toString()
         mViewModel.loginPressed(password, login_confirm_password.text.toString())
     }
 

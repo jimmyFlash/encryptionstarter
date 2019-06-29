@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jimmy.encryptionstarter.R
+import com.jimmy.encryptionstarter.datalogic.FileConstants
 import com.jimmy.encryptionstarter.datalogic.model.Pet
 import com.jimmy.encryptionstarter.uiutil.start
 import com.jimmy.encryptionstarter.views.main.MainActivity
@@ -47,7 +48,7 @@ class PetListActivity : AppCompatActivity() {
 
   private fun setupPets() {
     val file = File(filesDir.absolutePath + File.separator +
-        MainActivity.FileConstants.DATA_SOURCE_FILE_NAME)
+        FileConstants.DATA_SOURCE_FILE_NAME)
     val password = intent.getCharArrayExtra(PWD_KEY)
     petList.addAll( viewModel.getPets(file, password))
     adapter.notifyDataSetChanged()
