@@ -32,4 +32,5 @@ class PetDetailActivity :AppCompatActivity() {
     companion object {
         private const val PET_KEY = "PET"
     }
+
 }

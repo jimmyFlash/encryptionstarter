@@ -36,7 +36,7 @@ class PetListActivity : AppCompatActivity() {
       override fun onItemClick(position: Int, pet : Pet?) {
         val b = Bundle()
         b.putSerializable(PET_KEY, pet)
-        PetDetailActivity::class.start(this@PetListActivity, b, true)
+        PetDetailActivity::class.start(this@PetListActivity, b, false)
       }
 
     })
