@@ -35,8 +35,11 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
 import com.jimmy.encryptionstarter.datalogic.FileConstants.AES
+import com.jimmy.encryptionstarter.datalogic.FileConstants.ANDROID_KEY_STORE
 import com.jimmy.encryptionstarter.datalogic.FileConstants.ENCRYPTION_ALGORITHM
+import com.jimmy.encryptionstarter.datalogic.FileConstants.KEY_ALIAS
 import com.jimmy.encryptionstarter.datalogic.FileConstants.TRANSFORMATION
+import com.jimmy.encryptionstarter.datalogic.FileConstants.TRANSFORMATION_KEYSTORE
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.util.HashMap
@@ -143,7 +146,26 @@ internal class Encryption {
 
     val map = HashMap<String, ByteArray>()
 
-    //TODO: Add code here
+      // 1
+      //Get the key , retrieve the key from the KeyStore.
+      val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+      keyStore.load(null)
+
+      val secretKeyEntry =
+        keyStore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry
+      val secretKey = secretKeyEntry.secretKey
+
+      // 2
+      //Encrypt data, encrypted the data using the Cipher object, given the SecretKey.
+      val cipher = Cipher.getInstance(TRANSFORMATION_KEYSTORE)
+      cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+      val ivBytes = cipher.iv
+      val encryptedBytes = cipher.doFinal(dataToEncrypt)
+
+      // 3  return a HashMap containing the encrypted data and IV needed to decrypt the data.
+      map["iv"] = ivBytes
+      map["encrypted"] = encryptedBytes
+
 
     return map
   }
@@ -152,7 +174,27 @@ internal class Encryption {
 
     var decrypted: ByteArray? = null
 
-    //TODO: Add code here
+    // 1
+    //Get the key, Obtained the key again from the KeyStore.
+    val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+    keyStore.load(null)
+
+    val secretKeyEntry =
+      keyStore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry
+    val secretKey = secretKeyEntry.secretKey
+
+    // 2
+    //Extract info from map
+    val encryptedBytes = map["encrypted"]
+    val ivBytes = map["iv"]
+
+    // 3
+    //Decrypt data, Initialize the Cipher object using the DECRYPT_MODE constant and decrypted the data to a ByteArray.
+    val cipher = Cipher.getInstance(TRANSFORMATION_KEYSTORE)
+    val spec = GCMParameterSpec(128, ivBytes)
+    cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+    decrypted = cipher.doFinal(encryptedBytes)
+
 
     return decrypted
   }
@@ -160,7 +202,46 @@ internal class Encryption {
   @TargetApi(23)
   fun keystoreTest() {
 
-    //TODO: Add code here
+    //1 created a KeyGenerator instance and set it to the “AndroidKeyStore” provider.
+    val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+    val keyGenParameterSpec = KeyGenParameterSpec.Builder(KEY_ALIAS,
+      KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+      .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+      .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+      // 2 Optionally, you added .setUserAuthenticationRequired(true) requiring a lock screen to be set up.
+      //  requires lock screen, invalidated if lock screen is disabled
+      //.setUserAuthenticationRequired(true)
+
+      // 3 key only available x seconds from password authentication. -1 requires finger print - every time
+      //.setUserAuthenticationValidityDurationSeconds(120)
+
+      /*
+        requires API 24
+        makes the key unavailable once the device has detected it is no longer on the person
+       */
+      //.setUserAuthenticationValidWhileOnBody(true)
+
+      // 4 different ciphertext for same plaintext on each call
+      /*
+      use a new IV each time. As you learned earlier, that means that if you encrypt identical data a second time,
+      the encrypted output will not be identical. It prevents attackers from obtaining clues about the encrypted
+      data based on feeding in the same inputs.
+       */
+      .setRandomizedEncryptionRequired(true)
+      .build()
+    keyGenerator.init(keyGenParameterSpec)
+    keyGenerator.generateKey()
+
+    // Testing keystore
+    // 1
+    val map = keystoreEncrypt("My very sensitive string!".toByteArray(Charsets.UTF_8))
+    // 2 Called the decrypt method on the encrypted output to test that everything worked.
+    val decryptedBytes = keystoreDecrypt(map)
+    decryptedBytes?.let {
+      val decryptedString = String(it, Charsets.UTF_8)
+      Log.e("MyApp", "The decrypted string is: $decryptedString")
+    }
+
 
   }
 }

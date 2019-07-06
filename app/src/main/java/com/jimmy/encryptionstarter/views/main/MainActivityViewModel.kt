@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import com.jimmy.encryptionstarter.R
 import com.jimmy.encryptionstarter.datalogic.Encryption
 import com.jimmy.encryptionstarter.datalogic.FileConstants
+import com.jimmy.encryptionstarter.datalogic.FileConstants.PREFRENCE_NAME
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -45,13 +46,15 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                 FileConstants.DATA_SOURCE_FILE_NAME)
         updateLoggedInState()
 
+        Encryption().keystoreTest()
+
     }
 
     private fun saveLastLoggedInTime(context : Context) {
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
 
         //Save to shared prefs
-        val editor = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit()
+        val editor = context.getSharedPreferences(PREFRENCE_NAME, Context.MODE_PRIVATE).edit()
         editor.putString("l", currentDateTimeString)
         editor.apply()
     }
@@ -95,7 +98,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         val ivBase64String = Base64.encodeToString(map["iv"], Base64.NO_WRAP)
 
         //Save to shared prefs
-        val editor = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit()
+        val editor = context.getSharedPreferences(PREFRENCE_NAME, Context.MODE_PRIVATE).edit()
 
         // 3
         /*
@@ -150,7 +153,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
         //Retrieve shared prefs data
         // 1 Retrieved the string representations for the encrypted data, IV and salt.
-        val preferences = getApplication<Application>().getSharedPreferences("MyPrefs",
+        val preferences = getApplication<Application>().getSharedPreferences(PREFRENCE_NAME,
             Context.MODE_PRIVATE)
         val base64Encrypted = preferences.getString("l", "")
         val base64Salt = preferences.getString("lsalt", "")
