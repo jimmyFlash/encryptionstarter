@@ -2,6 +2,7 @@ package com.jimmy.encryptionstarter.views.main
 
 import android.app.Application
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -13,7 +14,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.text.DateFormat
-import java.util.*
+import java.util.Date
+
 
 class MainActivityViewModel(application : Application) : AndroidViewModel(application ){
 
@@ -53,7 +55,6 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         editor.putString("l", currentDateTimeString)
         editor.apply()
     }
-
     //This is just for demo data
     private fun createDataSource(context : Context, filename: String, outFile: File) {
         val fileDescriptor = context.assets.openFd(filename)
@@ -65,6 +66,48 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                     outputStream.channel)
             }
         }
+    }
+
+    private fun secureSaveLastLoggedInTime(context : Context, pwrdStr : String) {
+        //Get password
+        val password = CharArray(pwrdStr.length)
+        pwrdStr.toCharArray(password,0, 0, pwrdStr.length)
+
+        //Base64 the data
+        val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+        // 1
+        /*
+        Converted the String into a ByteArray with the UTF-8 encoding and encrypted it.
+        In the previous code you opened a file as binary, but in the case of working with strings,
+        you’ll need to take the character encoding into account.
+         */
+        val map = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8),
+            password)
+
+        // 2
+        /*
+        Converted the raw data into a String representation.
+        SharedPreferences can’t store a ByteArray directly but it can work with String.
+        Base64 is a standard that converts raw data to a string representation
+         */
+        val valueBase64String = Base64.encodeToString(map["encrypted"], Base64.NO_WRAP)
+        val saltBase64String = Base64.encodeToString(map["salt"], Base64.NO_WRAP)
+        val ivBase64String = Base64.encodeToString(map["iv"], Base64.NO_WRAP)
+
+        //Save to shared prefs
+        val editor = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit()
+
+        // 3
+        /*
+        Saved the strings to the SharedPreferences. You can optionally encrypt both the preference key and the value.
+        That way, an attacker can’t figure out what the value might be by looking at the key,
+        and using keys like “password” won’t work for brute forcing, since that would be encrypted as well.
+         */
+        editor.putString("l", valueBase64String)
+        editor.putString("lsalt", saltBase64String)
+        editor.putString("liv", ivBase64String)
+        editor.apply()
+
     }
 
     /**
@@ -100,18 +143,43 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         }
     }
 
-    private fun lastLoggedIn(): String? {
+    private fun lastLoggedIn(pwdString : String): String? {
+        //Get password
+        val password = CharArray(pwdString.length)
+        pwdString.toCharArray(password, 0, 0, pwdString.length)
+
         //Retrieve shared prefs data
+        // 1 Retrieved the string representations for the encrypted data, IV and salt.
         val preferences = getApplication<Application>().getSharedPreferences("MyPrefs",
             Context.MODE_PRIVATE)
-        return preferences.getString("l", "")
+        val base64Encrypted = preferences.getString("l", "")
+        val base64Salt = preferences.getString("lsalt", "")
+        val base64Iv = preferences.getString("liv", "")
+
+        //Base64 decode
+        // 2 Applied a Base64 decode on the strings to convert them back to raw bytes
+        val encrypted = Base64.decode(base64Encrypted, Base64.NO_WRAP)
+        val iv = Base64.decode(base64Iv, Base64.NO_WRAP)
+        val salt = Base64.decode(base64Salt, Base64.NO_WRAP)
+
+        //Decrypt
+        // 3 Passed that data in a HashMap to the decrypt method.
+        val decrypted = Encryption().decrypt(
+            hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
+
+        var lastLoggedIn: String? = null
+        decrypted?.let {
+            lastLoggedIn = String(it, Charsets.UTF_8)
+        }
+        return lastLoggedIn
+
     }
 
     fun loginPressed(password: String, logPassConfirm: String) {
 
         var success = false
         if(isSignedUp.value == true){
-            val lastLogin = lastLoggedIn()
+            val lastLogin = lastLoggedIn(password)
             if (lastLogin != null) {
                 success = true
                 lastLogMsg.value = "Last login: $lastLogin"
@@ -136,7 +204,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         }
 
         if (success) {
-            saveLastLoggedInTime(getApplication())
+            secureSaveLastLoggedInTime(getApplication(), password)
 
             proceedToListActivity.value = true
         }
