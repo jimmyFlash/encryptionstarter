@@ -48,10 +48,10 @@ dependencies {
 
 
     implementation androidXLib.appcompat
-    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation androidXLib.coreKTX
 
     implementation androidXLib.constraintLayout
-    implementation "com.google.android.material:material:$materialVersion"
+    implementation materialLib.material
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
