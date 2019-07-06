@@ -2,13 +2,16 @@ package com.jimmy.encryptionstarter.views.main
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jimmy.encryptionstarter.R
+import com.jimmy.encryptionstarter.datalogic.Encryption
 import com.jimmy.encryptionstarter.datalogic.FileConstants
 import java.io.File
 import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import java.text.DateFormat
 import java.util.*
 
@@ -64,6 +67,25 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         }
     }
 
+    /**
+     * open the data file as an input stream and fed the data into the encryption method.
+     * You serialized the HashMap using the ObjectOutputStream class and then saved it to storage.
+     */
+    private fun createDataSource(context : Context, filename: String, outFile: File, pwdStr : String) {
+        val inputStream = context.assets.open(filename)
+        val bytes = inputStream.readBytes()
+        inputStream.close()
+
+        val password = CharArray(pwdStr.length)
+        pwdStr.toCharArray(password,0, 0, pwdStr.length)
+       // Log.e("jjjjjjjj", "$pwdStr  ${pwdStr.length}  $password")
+        val map = Encryption().encrypt(bytes, password)
+        ObjectOutputStream(FileOutputStream(outFile)).use {
+            it.writeObject(map)
+        }
+
+    }
+
     private fun updateLoggedInState() {
         val fileExists = workingFile?.exists() ?: false
         if (fileExists) {
@@ -106,7 +128,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                 password.isEmpty() -> lastLogMsg.value = "Please enter a password!"
 
                 password == logPassConfirm -> workingFile?.let {
-                    createDataSource(getApplication(), "pets.xml", it)
+                    createDataSource(getApplication(), "pets.xml", it, password)
                     success = true
                 }
                 else -> lastLogMsg.value = "Passwords do not match!"

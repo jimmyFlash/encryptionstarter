@@ -34,6 +34,9 @@ import android.annotation.TargetApi
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
+import com.jimmy.encryptionstarter.datalogic.FileConstants.AES
+import com.jimmy.encryptionstarter.datalogic.FileConstants.ENCRYPTION_ALGORITHM
+import com.jimmy.encryptionstarter.datalogic.FileConstants.TRANSFORMATION
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.util.HashMap
@@ -66,12 +69,12 @@ internal class Encryption {
      */
     val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
 //    2- Passed PBEKeySpec into the SecretKeyFactory.
-    val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+    val secretKeyFactory = SecretKeyFactory.getInstance(ENCRYPTION_ALGORITHM)
 //    3- Generated the key as a ByteArray
     val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
 
 //    4- Wrapped the raw ByteArray into a SecretKeySpec object.
-    val keySpec = SecretKeySpec(keyBytes, "AES")
+    val keySpec = SecretKeySpec(keyBytes, AES)
 
     val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
     //  Created 16 bytes of random data.
@@ -88,7 +91,7 @@ internal class Encryption {
       not all data will fit perfectly into the block size, so you need to pad the remaining space.
        By the way, blocks are 128 bits long and AES adds padding before encryption.
      */
-    val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+    val cipher = Cipher.getInstance(TRANSFORMATION)
     cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
     // doFinal does the actual encryption.
     val encrypted = cipher.doFinal(dataToEncrypt)
@@ -119,15 +122,15 @@ internal class Encryption {
      */
     //regenerate key from password
     val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
-    val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+    val secretKeyFactory = SecretKeyFactory.getInstance(ENCRYPTION_ALGORITHM)
     val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-    val keySpec = SecretKeySpec(keyBytes, "AES")
+    val keySpec = SecretKeySpec(keyBytes, AES)
 
     /*
     Decrypted the data and returned it as a ByteArray.
      */
     //Decrypt
-    val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+    val cipher = Cipher.getInstance(TRANSFORMATION)
     val ivSpec = IvParameterSpec(iv)
     cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
     decrypted = cipher.doFinal(encrypted)

@@ -3,10 +3,14 @@ package com.jimmy.encryptionstarter.views.petslist
 
 
 import androidx.lifecycle.ViewModel
+import com.jimmy.encryptionstarter.datalogic.Encryption
 import com.jimmy.encryptionstarter.datalogic.model.Pet
 import com.jimmy.encryptionstarter.datalogic.model.Pets
 import org.simpleframework.xml.core.Persister
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
 
 class PetViewModel : ViewModel() {
 
@@ -22,12 +26,11 @@ class PetViewModel : ViewModel() {
 
   private fun loadPets(file: File, password: CharArray) {
 
-    /*
-    var decrypted: ByteArray? = null
-    ObjectInputStream(FileInputStream(file)).use { it ->
-      val data = it.readObject()
 
-      when(data) {
+    var decrypted: ByteArray? = null
+    ObjectInputStream(FileInputStream(file)).use {
+
+        when(val data = it.readObject()) {
         is Map<*, *> -> {
 
           if (data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
@@ -35,7 +38,8 @@ class PetViewModel : ViewModel() {
             val salt = data["salt"]
             val encrypted = data["encrypted"]
             if (iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-              //TODO: Add decrypt call here
+                decrypted = Encryption().decrypt(
+                    hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
             }
           }
         }
@@ -43,13 +47,13 @@ class PetViewModel : ViewModel() {
     }
 
     if (decrypted != null) {
-    */
+
       val serializer = Persister()
-      val inputStream = file.inputStream() //TODO: Replace me
-      val pets = try { serializer.read(Pets::class.java, inputStream) } catch (e: Exception) {null}
+        val inputStream = ByteArrayInputStream(decrypted) //  input stream comes from a ByteArray
+        val pets = try { serializer.read(Pets::class.java, inputStream) } catch (e: Exception) {null}
       pets?.list?.let {
         this.pets = ArrayList(it)
       }
-    /*} */
+    }
   }
 }
