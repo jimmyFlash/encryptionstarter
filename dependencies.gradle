@@ -12,6 +12,8 @@ ext{
     lifecycleExtensions="2.0.0"
     recyclerview="1.0.0"
     legacySupport="1.0.0"
+    lifecycleExtensions = "2.0.0"
+    converterSimplexml = "2.0.0-beta3"
 
     libraries = [
             kotlinStdLib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -29,11 +31,18 @@ ext{
     androidXLib = [
             appcompat : "androidx.appcompat:appcompat:$appCompatX" ,
             constraintLayout : "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion",
-            coreKTX : "androidx.core:core-ktx:$coreKtx"
+            coreKTX : "androidx.core:core-ktx:$coreKtx",
+            lifecycleExtensions : "androidx.lifecycle:lifecycle-extensions:$lifecycleExtensions",
+            recyclerview : "androidx.recyclerview:recyclerview:$recyclerview",
+            legacySupport : "androidx.legacy:legacy-support-v4:$legacySupport"
     ]
 
     materialLib = [
             material : "com.google.android.material:material:$materialVersion"
+    ]
+
+    retrofit = [
+            converterSimpleXml : "com.squareup.retrofit2:converter-simplexml:$converterSimplexml"
     ]
 
 }
