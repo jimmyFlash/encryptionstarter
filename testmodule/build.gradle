@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion Version.compileSdkVersion
     defaultConfig {
-        minSdkVersion  rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode  rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
+        minSdkVersion  Version.minSdkVersion
+        targetSdkVersion Version.targetSdkVersion
+        versionCode  Version.versionCode
+        versionName Version.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -25,10 +25,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation androidXLib.appcompat
-    implementation androidXLib.constraintLayout
-    testImplementation testLibraries.junit4
-    androidTestImplementation androidTestLibraries.testRunner
-    androidTestImplementation androidTestLibraries.espresso
-    implementation libraries.kotlinStdLib
+    implementation Deps.appcompat
+    implementation Deps.constraintLayout
+    testImplementation Deps.junit4
+    androidTestImplementation Deps.testRunner
+    androidTestImplementation Deps.espresso
+    implementation Deps.kotlin_sdkLib
 }

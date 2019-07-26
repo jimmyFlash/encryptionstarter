@@ -43,6 +43,7 @@ import com.jimmy.encryptionstarter.datalogic.FileConstants.TRANSFORMATION_KEYSTO
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.util.HashMap
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKeyFactory
@@ -135,8 +136,12 @@ internal class Encryption {
     //Decrypt
     val cipher = Cipher.getInstance(TRANSFORMATION)
     val ivSpec = IvParameterSpec(iv)
-    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-    decrypted = cipher.doFinal(encrypted)
+    try {
+      cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+      decrypted = cipher.doFinal(encrypted)
+    } catch (e: BadPaddingException) {
+      Log.e("BadPaddingException", e.localizedMessage)
+    }
 
 
     return decrypted

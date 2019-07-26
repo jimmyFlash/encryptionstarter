@@ -7,13 +7,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion Version.compileSdkVersion
     defaultConfig {
         applicationId "com.jimmy.encryptionstarter"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode  rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
+        minSdkVersion Version.minSdkVersion
+        targetSdkVersion Version.targetSdkVersion
+        versionCode  Version.versionCode
+        versionName Version.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -38,26 +38,26 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation libraries.kotlinStdLib
+    implementation Deps.kotlin_sdkLib
 
-    testImplementation testLibraries.junit4
+    testImplementation Deps.junit4
 
-    androidTestImplementation androidTestLibraries.testRunner
+    androidTestImplementation Deps.testRunner
 
-    androidTestImplementation androidTestLibraries.espresso
+    androidTestImplementation Deps.espresso
 
 
-    implementation androidXLib.appcompat
-    implementation androidXLib.coreKTX
+    implementation Deps.appcompat
+    implementation Deps.coreKTX
 
-    implementation androidXLib.constraintLayout
-    implementation materialLib.material
+    implementation Deps.constraintLayout
+    implementation Deps.material
 
-    implementation androidXLib.lifecycleExtensions
-    implementation androidXLib.recyclerview
-    implementation androidXLib.legacySupport
+    implementation Deps.lifecycleExtensions
+    implementation Deps.recyclerview
+    implementation Deps.legacySupport
 
-    implementation (retrofit.converterSimpleXml){
+    implementation (Deps.converterSimpleXml){
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'
