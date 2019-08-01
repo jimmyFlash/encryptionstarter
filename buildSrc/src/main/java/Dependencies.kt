@@ -1,6 +1,6 @@
 object Version{
 
-    val kotlinVersion = "1.3.11"
+    val kotlinVersion = "1.3.41"
     val appCompatVersion = "28.0.0"
     val appCompatX= "1.0.2"
     val junit4Version = "4.12"
