@@ -52,8 +52,16 @@ class PetViewModel : ViewModel() {
         val inputStream = ByteArrayInputStream(decrypted) //  input stream comes from a ByteArray
         val pets = try { serializer.read(Pets::class.java, inputStream) } catch (e: Exception) {null}
       pets?.list?.let {
-        this.pets = ArrayList(it)
+        this.pets = it as ArrayList<Pet>
       }
     }
+  }
+
+  fun testPetsArrayChange(pets : MutableList<Pet>): MutableList<Pet>{
+    val petsListUpdate = mutableListOf<Pet>()
+
+    petsListUpdate.addAll(pets)
+    petsListUpdate.removeAt(0)
+    return petsListUpdate
   }
 }

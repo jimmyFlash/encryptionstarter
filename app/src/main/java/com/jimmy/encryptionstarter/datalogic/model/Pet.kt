@@ -50,4 +50,14 @@ data class Pet constructor(
 
     @field:Element(name = "medicalNotes")
     @param:Element(name = "medicalNotes")
-    var medicalNotes: String = "") : Serializable
+    var medicalNotes: String = "") : Serializable{
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Pet) {
+            name == other.name && imageResourceName == other.imageResourceName
+        } else {
+            false
+        }
+    }
+}
+

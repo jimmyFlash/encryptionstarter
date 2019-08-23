@@ -3,24 +3,47 @@ package com.jimmy.encryptionstarter.views.petslist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.NonNull
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jimmy.encryptionstarter.R
 import com.jimmy.encryptionstarter.databinding.RecyclerviewItemRowBinding
 import com.jimmy.encryptionstarter.datalogic.model.Pet
-import com.jimmy.encryptionstarter.uiutil.recyclerutils.PetsDiffCallback
 
-class RecyclerAdapter(private val petsList: ArrayList<Pet>,
-                      private var listener: PhotoHolder.OnItemClickListener) :
+
+class RecyclerAdapter(private var listener: PhotoHolder.OnItemClickListener) :
   RecyclerView.Adapter<RecyclerAdapter.PhotoHolder>() {
+
+
+  var diffAsync : AsyncListDiffer<Pet>
 
   lateinit var inflatedViewBinding : RecyclerviewItemRowBinding
 
-  override fun getItemCount() = petsList.size
+
+  init{
+
+
+    val diffUtilCallback = object : DiffUtil.ItemCallback<Pet>() {
+
+      override fun areItemsTheSame(@NonNull newUser: Pet, @NonNull oldUser: Pet): Boolean {
+        return newUser.name.equals(oldUser.name)
+      }
+
+      override fun areContentsTheSame(@NonNull newUser: Pet, @NonNull oldUser: Pet): Boolean {
+        return newUser.equals(oldUser)
+      }
+    }
+
+    diffAsync = AsyncListDiffer(this@RecyclerAdapter, diffUtilCallback  )
+
+  }
+
+  override fun getItemCount() = diffAsync.currentList.size
 
   override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
-    val pet = petsList[position]
+    val pet = diffAsync.currentList[position]
     holder.bindPet(pet, listener)
   }
 
@@ -31,13 +54,8 @@ class RecyclerAdapter(private val petsList: ArrayList<Pet>,
     return PhotoHolder(inflatedViewBinding)
   }
 
-  fun swap(actors: List<Pet>) {
-    val diffCallback = PetsDiffCallback(petsList, actors)
-    val diffResult = DiffUtil.calculateDiff(diffCallback)
-
-    petsList.clear()
-    petsList.addAll(actors)
-    diffResult.dispatchUpdatesTo(this)
+  fun swap(actors: MutableList<Pet>) {
+   diffAsync.submitList(actors)
   }
 
   class PhotoHolder(private var binding: RecyclerviewItemRowBinding) :
